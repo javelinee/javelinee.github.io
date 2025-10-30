@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resize Favicon</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .upload-area {
+            padding: 40px;
+            background: white;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            margin: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: #6366f1;
+        }
+        .preview-container {
+            display: flex;
+            gap: 30px;
+            margin: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .preview-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 1px solid #ccc;
+            display: block;
+            margin: 10px auto;
+        }
+        button {
+            padding: 12px 24px;
+            margin: 10px;
+            font-size: 16px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #4f46e5;
+        }
+        .hidden {
+            display: none;
+        }
+        .instructions {
+            max-width: 600px;
+            margin: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Resize Your Favicon</h1>
+    
+    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <h3>📁 Click to Upload Your favicon.png</h3>
+        <p>Or drag and drop your image here</p>
+        <input type="file" id="fileInput" accept="image/*" class="hidden">
+    </div>
+    
+    <div id="previewArea" class="preview-container hidden">
+        <div class="preview-item">
+            <h3>32x32</h3>
+            <canvas id="canvas32" width="32" height="32"></canvas>
+            <button onclick="downloadCanvas('canvas32', 'favicon.png')">Download</button>
+        </div>
+        <div class="preview-item">
+            <h3>192x192</h3>
+            <canvas id="canvas192" width="192" height="192"></canvas>
+            <button onclick="downloadCanvas('canvas192', 'Icon-192.png')">Download</button>
+        </div>
+        <div class="preview-item">
+            <h3>512x512</h3>
+            <canvas id="canvas512" width="512" height="512"></canvas>
+            <button onclick="downloadCanvas('canvas512', 'Icon-512.png')">Download</button>
+        </div>
+    </div>
+    
+    <div id="downloadAll" class="hidden">
+        <button onclick="downloadAllSizes()">📥 Download All Sizes</button>
+    </div>
+    
+    <div class="instructions">
+        <h3>How to use:</h3>
+        <ol>
+            <li>Click the upload area above and select your current favicon.png</li>
+            <li>The tool will create 3 different sizes: 32x32, 192x192, and 512x512</li>
+            <li>Click "Download All Sizes" or download each individually</li>
+            <li>Place the files in your project:
+                <ul>
+                    <li><code>favicon.png</code> → <code>web/favicon.png</code></li>
+                    <li><code>Icon-192.png</code> → <code>web/icons/Icon-192.png</code> (and copy as Icon-maskable-192.png)</li>
+                    <li><code>Icon-512.png</code> → <code>web/icons/Icon-512.png</code> (and copy as Icon-maskable-512.png)</li>
+                </ul>
+            </li>
+            <li>Rebuild: <code>flutter build web --release --base-href "/"</code></li>
+        </ol>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.querySelector('.upload-area');
+        const previewArea = document.getElementById('previewArea');
+        const downloadAll = document.getElementById('downloadAll');
+        let uploadedImage = null;
+
+        // File input change
+        fileInput.addEventListener('change', handleFile);
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#6366f1';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ccc';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ccc';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        });
+
+        function handleFile(e) {
+            const file = e.target.files[0];
+            if (file) {
+                loadImage(file);
+            }
+        }
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    uploadedImage = img;
+                    createResizedImages(img);
+                    previewArea.classList.remove('hidden');
+                    downloadAll.classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function createResizedImages(img) {
+            resizeImage(img, 'canvas32', 32);
+            resizeImage(img, 'canvas192', 192);
+            resizeImage(img, 'canvas512', 512);
+        }
+
+        function resizeImage(img, canvasId, size) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Enable image smoothing for better quality
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            // Clear and draw
+            ctx.clearRect(0, 0, size, size);
+            ctx.drawImage(img, 0, 0, size, size);
+        }
+
+        function downloadCanvas(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function downloadAllSizes() {
+            setTimeout(() => downloadCanvas('canvas32', 'favicon.png'), 100);
+            setTimeout(() => downloadCanvas('canvas192', 'Icon-192.png'), 300);
+            setTimeout(() => downloadCanvas('canvas512', 'Icon-512.png'), 500);
+            alert('Downloading all sizes! Check your Downloads folder.\n\nDon\'t forget to copy:\n- Icon-192.png as Icon-maskable-192.png\n- Icon-512.png as Icon-maskable-512.png');
+        }
+    </script>
+</body>
+</html>
+

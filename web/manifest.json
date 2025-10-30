@@ -1,11 +1,11 @@
 {
-    "name": "portfolio_app",
-    "short_name": "portfolio_app",
+    "name": "Jesselyn Hartandi - Full-Stack Engineer",
+    "short_name": "Jesselyn H.",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#1a1a2e",
+    "theme_color": "#6366f1",
+    "description": "Full-Stack Engineer specializing in web development, mobile apps, and cloud solutions.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
