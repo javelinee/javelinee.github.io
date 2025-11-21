@@ -110,7 +110,7 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
                   ),
                   child: ClipOval(
                     child: Image.asset(
-                      'me.png',
+                      'assets/me.png',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -214,7 +214,7 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
                   ),
                   child: ClipOval(
                     child: Image.asset(
-                      'me.png',
+                      'assets/me.png',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -509,7 +509,7 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
                     const SizedBox(width: 16),
                     if (ContactInfo.personal.linkedinUrl != null)
                       _buildContactImageButton(
-                        imagePath: 'linkedin_icon.png',
+                        imagePath: 'assets/linkedin_icon.png',
                         tooltip: 'LinkedIn',
                         onTap: () =>
                             _launchUrl(ContactInfo.personal.linkedinUrl!),
