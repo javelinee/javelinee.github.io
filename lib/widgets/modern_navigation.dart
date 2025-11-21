@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../pages/home_page.dart';
-import '../pages/projects_page.dart';
-import '../pages/skills_page.dart';
-import '../pages/contact_page.dart';
+import '../pages/single_page_portfolio.dart';
 import '../providers/theme_provider.dart';
 
 class ModernNavigation extends StatefulWidget {
@@ -15,25 +12,27 @@ class ModernNavigation extends StatefulWidget {
 }
 
 class _ModernNavigationState extends State<ModernNavigation> {
-  final PageController _pageController = PageController();
   int _currentIndex = 0;
+  final GlobalKey<SinglePagePortfolioState> _portfolioKey = GlobalKey();
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
+  void _navigateToSection(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
 
-  void _navigateToPage(int index) {
-    if (index != _currentIndex) {
-      setState(() {
-        _currentIndex = index;
-      });
-      _pageController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+    final portfolioState = _portfolioKey.currentState;
+    if (portfolioState != null) {
+      switch (index) {
+        case 0:
+          portfolioState.scrollToExperience();
+          break;
+        case 1:
+          portfolioState.scrollToProjects();
+          break;
+        case 2:
+          portfolioState.scrollToContact();
+          break;
+      }
     }
   }
 
@@ -41,6 +40,7 @@ class _ModernNavigationState extends State<ModernNavigation> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final isWeb = MediaQuery.of(context).size.width > 768;
 
     return Scaffold(
@@ -48,160 +48,65 @@ class _ModernNavigationState extends State<ModernNavigation> {
         children: [
           // Enhanced Modern Top Navigation Bar
           Container(
-            height: 84,
+            height: 70,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  colorScheme.surface,
-                  colorScheme.surface.withOpacity(0.95),
-                ],
-              ),
+              color: isDark ? const Color(0xFF0d1b2a) : const Color(0xFFFFFFFF),
               border: Border(
                 bottom: BorderSide(
-                  color: colorScheme.outline.withOpacity(0.1),
+                  color: isDark
+                      ? Colors.white.withOpacity(0.05)
+                      : const Color(0xFFe2e8f0),
                   width: 1,
                 ),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: colorScheme.shadow.withOpacity(0.08),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                  spreadRadius: 0,
-                ),
-                BoxShadow(
-                  color: colorScheme.primary.withOpacity(0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                  spreadRadius: -2,
-                ),
-              ],
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
             ),
             child: SafeArea(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: isWeb ? 48 : 24),
                 child: Row(
                   children: [
-                    // Enhanced Logo/Brand
-                    Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                colorScheme.primary,
-                                colorScheme.secondary,
-                                colorScheme.tertiary,
-                              ],
-                              stops: const [0.0, 0.6, 1.0],
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: colorScheme.primary.withOpacity(0.25),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.flutter_dash_rounded,
-                            color: colorScheme.onPrimary,
-                            size: 24,
-                          ),
+                    // Logo on the left
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(
+                          'favicon.png',
+                          fit: BoxFit.contain,
+                          filterQuality: FilterQuality.high,
                         ),
-                        const SizedBox(width: 16),
-                        if (isWeb) ...[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'Jesselyn',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w800,
-                                      color: colorScheme.onSurface,
-                                      height: 1.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    ' Hartandi',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400,
-                                      color: colorScheme.primary,
-                                      height: 1.0,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                'Flutter Developer',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                  color: colorScheme.onSurface.withOpacity(0.6),
-                                  height: 1.0,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ],
+                      ),
                     ),
-
+                    
                     const Spacer(),
-
+                    
                     // Navigation Items
                     if (isWeb) ...[
                       // Web Navigation
                       Row(
                         children: [
-                          _buildNavItem(
-                            context,
-                            'Home',
-                            0,
-                            Icons.home_outlined,
-                            Icons.home,
-                          ),
+                          _buildNavItem(context, 'Experience', 0),
                           const SizedBox(width: 32),
-                          _buildNavItem(
-                            context,
-                            'Skills',
-                            1,
-                            Icons.code_outlined,
-                            Icons.code,
-                          ),
+                          _buildNavItem(context, 'Projects', 1),
                           const SizedBox(width: 32),
-                          _buildNavItem(
-                            context,
-                            'Projects',
-                            2,
-                            Icons.work_outline,
-                            Icons.work,
-                          ),
-                          const SizedBox(width: 32),
-                          _buildNavItem(
-                            context,
-                            'Contact',
-                            3,
-                            Icons.contact_mail_outlined,
-                            Icons.contact_mail,
-                          ),
-                          const SizedBox(width: 24),
-                          _buildThemeToggle(context),
+                          _buildNavItem(context, 'Contact', 2),
                         ],
                       ),
+                      const Spacer(),
+                      _buildThemeToggle(context),
                     ] else ...[
                       // Mobile Navigation
                       Row(
@@ -225,25 +130,7 @@ class _ModernNavigationState extends State<ModernNavigation> {
           ),
 
           // Page Content
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              children: [
-                HomePage(
-                  onNavigateToProjects: () => _navigateToPage(2),
-                  onNavigateToContact: () => _navigateToPage(3),
-                ),
-                const SkillsPage(),
-                const ProjectsPage(),
-                const ContactPage(),
-              ],
-            ),
-          ),
+          Expanded(child: SinglePagePortfolio(key: _portfolioKey)),
         ],
       ),
     );
@@ -253,17 +140,15 @@ class _ModernNavigationState extends State<ModernNavigation> {
     BuildContext context,
     String label,
     int index,
-    IconData icon,
-    IconData selectedIcon,
   ) {
     final isSelected = _currentIndex == index;
 
     return _EnhancedNavItem(
       label: label,
-      icon: icon,
-      selectedIcon: selectedIcon,
+      icon: Icons.circle,
+      selectedIcon: Icons.circle,
       isSelected: isSelected,
-      onTap: () => _navigateToPage(index),
+      onTap: () => _navigateToSection(index),
     );
   }
 
@@ -293,10 +178,9 @@ class _ModernNavigationState extends State<ModernNavigation> {
             const SizedBox(height: 24),
 
             // Menu Items
-            _buildMobileMenuItem(context, 'Home', Icons.home, 0),
-            _buildMobileMenuItem(context, 'Skills', Icons.code, 1),
-            _buildMobileMenuItem(context, 'Projects', Icons.work, 2),
-            _buildMobileMenuItem(context, 'Contact', Icons.contact_mail, 3),
+            _buildMobileMenuItem(context, 'Experience', Icons.work, 0),
+            _buildMobileMenuItem(context, 'Projects', Icons.folder, 1),
+            _buildMobileMenuItem(context, 'Contact', Icons.contact_mail, 2),
 
             const SizedBox(height: 24),
           ],
@@ -328,7 +212,7 @@ class _ModernNavigationState extends State<ModernNavigation> {
       ),
       onTap: () {
         Navigator.pop(context);
-        _navigateToPage(index);
+        _navigateToSection(index);
       },
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       tileColor: isSelected ? colorScheme.primary.withOpacity(0.1) : null,
@@ -338,72 +222,13 @@ class _ModernNavigationState extends State<ModernNavigation> {
   Widget _buildThemeToggle(BuildContext context) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
-            ),
+        return IconButton(
+          onPressed: () => themeProvider.toggleTheme(),
+          icon: Icon(
+            themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+            size: 22,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Light Mode Button
-              GestureDetector(
-                onTap: () => themeProvider.setTheme(false),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: !themeProvider.isDarkMode
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.transparent,
-                    borderRadius: const BorderRadius.horizontal(
-                      left: Radius.circular(18),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.light_mode,
-                    size: 18,
-                    color: !themeProvider.isDarkMode
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withOpacity(0.7),
-                  ),
-                ),
-              ),
-              // Dark Mode Button
-              GestureDetector(
-                onTap: () => themeProvider.setTheme(true),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: themeProvider.isDarkMode
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.transparent,
-                    borderRadius: const BorderRadius.horizontal(
-                      right: Radius.circular(18),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.dark_mode,
-                    size: 18,
-                    color: themeProvider.isDarkMode
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withOpacity(0.7),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          tooltip: themeProvider.isDarkMode ? 'Light Mode' : 'Dark Mode',
         );
       },
     );
@@ -477,81 +302,26 @@ class _EnhancedNavItemState extends State<_EnhancedNavItem>
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  gradient: widget.isSelected
-                      ? LinearGradient(
-                          colors: [
-                            colorScheme.primary.withOpacity(0.15),
-                            colorScheme.secondary.withOpacity(0.08),
-                          ],
-                        )
-                      : _isHovered
-                      ? LinearGradient(
-                          colors: [
-                            colorScheme.primary.withOpacity(0.08),
-                            colorScheme.secondary.withOpacity(0.04),
-                          ],
-                        )
-                      : null,
-                  borderRadius: BorderRadius.circular(16),
-                  border: widget.isSelected
-                      ? Border.all(
-                          color: colorScheme.primary.withOpacity(0.3),
-                          width: 1,
-                        )
-                      : _isHovered
-                      ? Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        )
-                      : null,
-                  boxShadow: widget.isSelected
-                      ? [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
-                      : _isHovered
-                      ? [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 6,
-                            offset: const Offset(0, 3),
-                          ),
-                        ]
-                      : null,
+                  color: widget.isSelected
+                      ? colorScheme.primary.withOpacity(0.1)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      widget.isSelected ? widget.selectedIcon : widget.icon,
-                      size: 20,
-                      color: widget.isSelected
-                          ? colorScheme.primary
-                          : _isHovered
-                          ? colorScheme.primary.withOpacity(0.8)
-                          : colorScheme.onSurface.withOpacity(0.7),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      widget.label,
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: widget.isSelected
-                            ? FontWeight.w600
-                            : _isHovered
-                            ? FontWeight.w500
-                            : FontWeight.w400,
-                        color: widget.isSelected
-                            ? colorScheme.primary
-                            : _isHovered
-                            ? colorScheme.primary.withOpacity(0.8)
-                            : colorScheme.onSurface.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  widget.label,
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    fontWeight: widget.isSelected
+                        ? FontWeight.w600
+                        : _isHovered
+                        ? FontWeight.w500
+                        : FontWeight.w400,
+                    color: widget.isSelected
+                        ? colorScheme.primary
+                        : _isHovered
+                        ? colorScheme.onSurface.withOpacity(0.9)
+                        : colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
               ),
             );
@@ -572,3 +342,4 @@ class _EnhancedNavItemState extends State<_EnhancedNavItem>
     }
   }
 }
+

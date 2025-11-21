@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ThemeProvider extends ChangeNotifier {
-  bool _isDarkMode = true;
+  bool _isDarkMode = false; // Default to light mode
 
   bool get isDarkMode => _isDarkMode;
 
@@ -10,7 +10,12 @@ class ThemeProvider extends ChangeNotifier {
     colorScheme: ColorScheme.fromSeed(
       seedColor: const Color(0xFF6366F1), // Modern indigo
       brightness: Brightness.light,
+    ).copyWith(
+      surface: const Color(0xFFFAFAFA), // Soft off-white
+      onSurface: const Color(0xFF1a1a1a), // Soft black text
+      surfaceContainerHighest: const Color(0xFFFFFFFF), // Pure white for cards
     ),
+    scaffoldBackgroundColor: const Color(0xFFF5F5F7), // Soft light gray
     textTheme: GoogleFonts.poppinsTextTheme(),
     useMaterial3: true,
     appBarTheme: AppBarTheme(
@@ -50,15 +55,16 @@ class ThemeProvider extends ChangeNotifier {
           seedColor: const Color(0xFF6366F1), // Modern indigo
           brightness: Brightness.dark,
         ).copyWith(
-          // Enhanced dark theme colors
-          surface: const Color(0xFF0F0F0F), // Deeper dark background
-          onSurface: const Color(0xFFE4E4E7), // Softer white text
-          surfaceContainerHighest: const Color(0xFF1C1C1E), // Card backgrounds
-          outline: const Color(0xFF3F3F46), // Subtle borders
+          // Blue-toned dark theme
+          surface: const Color(0xFF0d1b2a), // Deep blue background
+          onSurface: const Color(0xFFE0E7FF), // Light blue-white text
+          surfaceContainerHighest: const Color(0xFF1b263b), // Blue card backgrounds
+          outline: const Color(0xFF415a77), // Blue-gray borders
+          primary: const Color(0xFF818CF8), // Brighter indigo for accents
         ),
     textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
     useMaterial3: true,
-    scaffoldBackgroundColor: const Color(0xFF0A0A0A), // Very dark scaffold
+    scaffoldBackgroundColor: const Color(0xFF0a1628), // Deep blue scaffold
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
