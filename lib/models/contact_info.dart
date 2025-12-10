@@ -6,6 +6,7 @@ class ContactInfo {
   final String? whatsappNumber;
   final String? linkedinUrl;
   final String? githubUrl;
+  final String? mediumUrl;
   final String? websiteUrl;
   final String? location;
   final String bio;
@@ -19,6 +20,7 @@ class ContactInfo {
     this.whatsappNumber,
     this.linkedinUrl,
     this.githubUrl,
+    this.mediumUrl,
     this.websiteUrl,
     this.location,
     required this.bio,
@@ -28,12 +30,13 @@ class ContactInfo {
   // Static instance with your personal information
   static const ContactInfo personal = ContactInfo(
     name: 'Jesselyn Hartandi',
-    title: 'Flutter Developer',
+    title: 'App Developer • Flutter Developer • Mobile App Creator',
     email: 'jesselynhartandii@gmail.com',
     phoneNumber: '+6285173456067',
     whatsappNumber: '+6285173456067',
     linkedinUrl: 'https://id.linkedin.com/in/jesselyn-hartandi',
     githubUrl: 'https://github.com/javelinee',
+    mediumUrl: 'https://medium.com/@yourdailyreads',
     location: 'Jakarta, Indonesia',
     shortBio:
         'Software Engineer specializing in building scalable applications and solving complex technical challenges. Passionate about clean code, user experience, and innovative solutions.',
@@ -49,6 +52,7 @@ class ContactInfo {
     String? whatsappNumber,
     String? linkedinUrl,
     String? githubUrl,
+    String? mediumUrl,
     String? websiteUrl,
     String? location,
     String? bio,
@@ -62,6 +66,7 @@ class ContactInfo {
       whatsappNumber: whatsappNumber ?? this.whatsappNumber,
       linkedinUrl: linkedinUrl ?? this.linkedinUrl,
       githubUrl: githubUrl ?? this.githubUrl,
+      mediumUrl: mediumUrl ?? this.mediumUrl,
       websiteUrl: websiteUrl ?? this.websiteUrl,
       location: location ?? this.location,
       bio: bio ?? this.bio,

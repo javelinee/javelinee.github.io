@@ -9,6 +9,8 @@ class Project {
   final String? githubUrl;
   final String? liveUrl;
   final String? driveUrl;
+  final String? testingGroupUrl;
+  final String? playStoreUrl;
   final ProjectCategory category;
   final DateTime completedDate;
   final Color? backgroundColor;
@@ -22,6 +24,8 @@ class Project {
     this.githubUrl,
     this.liveUrl,
     this.driveUrl,
+    this.testingGroupUrl,
+    this.playStoreUrl,
     required this.category,
     required this.completedDate,
     this.backgroundColor,
@@ -36,6 +40,8 @@ class Project {
     String? githubUrl,
     String? liveUrl,
     String? driveUrl,
+    String? testingGroupUrl,
+    String? playStoreUrl,
     ProjectCategory? category,
     DateTime? completedDate,
     Color? backgroundColor,
@@ -49,6 +55,8 @@ class Project {
       githubUrl: githubUrl ?? this.githubUrl,
       liveUrl: liveUrl ?? this.liveUrl,
       driveUrl: driveUrl ?? this.driveUrl,
+      testingGroupUrl: testingGroupUrl ?? this.testingGroupUrl,
+      playStoreUrl: playStoreUrl ?? this.playStoreUrl,
       category: category ?? this.category,
       completedDate: completedDate ?? this.completedDate,
       backgroundColor: backgroundColor ?? this.backgroundColor,

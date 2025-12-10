@@ -389,25 +389,23 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
           // Projects Grid
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = constraints.maxWidth > 1200
-                  ? 3
+              final cardWidth = constraints.maxWidth > 1200
+                  ? (constraints.maxWidth - 48) / 3
                   : constraints.maxWidth > 600
-                  ? 2
-                  : 1;
+                  ? (constraints.maxWidth - 24) / 2
+                  : constraints.maxWidth;
 
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 24,
-                  mainAxisSpacing: 24,
-                  childAspectRatio: 1.1,
-                ),
-                itemCount: projects.length,
-                itemBuilder: (context, index) {
-                  return _buildProjectCard(context, projects[index]);
-                },
+              return Wrap(
+                spacing: 24,
+                runSpacing: 24,
+                children: projects
+                    .map(
+                      (project) => SizedBox(
+                        width: cardWidth,
+                        child: _buildProjectCard(context, project),
+                      ),
+                    )
+                    .toList(),
               );
             },
           ),
@@ -550,177 +548,227 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Timeline indicator
-          Column(
-            children: [
-              Container(
-                width: 16,
-                height: 16,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF06b6d4),
-                ),
-              ),
-              if (!isLast)
-                Expanded(
-                  child: Container(
-                    width: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    color: const Color(0xFF2d3748),
-                  ),
-                ),
-            ],
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Timeline indicator
+        Container(
+          width: isDesktop ? 16 : 8,
+          height: isDesktop ? 16 : 8,
+          margin: EdgeInsets.only(top: 4),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Color(0xFF06b6d4),
           ),
-          const SizedBox(width: 24),
+        ),
+        SizedBox(width: isDesktop ? 24 : 10),
 
-          // Content
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 48),
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1b263b) : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isDark
-                      ? Colors.white.withOpacity(0.05)
-                      : const Color(0xFFe2e8f0),
-                  width: 1,
-                ),
-                boxShadow: isDark
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+        // Content
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.only(bottom: isDesktop ? 48 : 20),
+            padding: EdgeInsets.all(isDesktop ? 18 : 10),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1b263b) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withOpacity(0.05)
+                    : const Color(0xFFe2e8f0),
+                width: 1,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              experience.position,
-                              style: GoogleFonts.inter(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              experience.company,
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: isDark
-                                    ? const Color(0xFF718096)
-                                    : const Color(0xFF64748b),
-                              ),
-                            ),
-                          ],
-                        ),
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                      const SizedBox(width: 16),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.white.withOpacity(0.05)
-                              : const Color(0xFFf1f5f9),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              size: 14,
+                    ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Responsive header layout
+                isDesktop
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  experience.position,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  experience.company,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: isDark
+                                        ? const Color(0xFF718096)
+                                        : const Color(0xFF64748b),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.white.withOpacity(0.05)
+                                  : const Color(0xFFf1f5f9),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 14,
+                                  color: isDark
+                                      ? const Color(0xFF718096)
+                                      : const Color(0xFF64748b),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '${experience.startDate} - ${experience.endDate}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark
+                                        ? const Color(0xFF718096)
+                                        : const Color(0xFF64748b),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            experience.position,
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            experience.company,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
                               color: isDark
                                   ? const Color(0xFF718096)
                                   : const Color(0xFF64748b),
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '${experience.startDate} - ${experience.endDate}',
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: isDark
-                                    ? const Color(0xFF718096)
-                                    : const Color(0xFF64748b),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    experience.description,
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                      color: isDark
-                          ? const Color(0xFFa0aec0)
-                          : const Color(0xFF64748b),
-                      height: 1.6,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Achievements
-                  ...experience.achievements.map(
-                    (achievement) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(
-                            Icons.check_circle,
-                            size: 16,
-                            color: Color(0xFF06b6d4),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              achievement,
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: isDark
-                                    ? const Color(0xFFa0aec0)
-                                    : const Color(0xFF64748b),
-                                height: 1.5,
-                              ),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.white.withOpacity(0.05)
+                                  : const Color(0xFFf1f5f9),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 10,
+                                  color: isDark
+                                      ? const Color(0xFF718096)
+                                      : const Color(0xFF64748b),
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  '${experience.startDate} - ${experience.endDate}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark
+                                        ? const Color(0xFF718096)
+                                        : const Color(0xFF64748b),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
+                SizedBox(height: isDesktop ? 12 : 6),
+                Text(
+                  experience.description,
+                  style: GoogleFonts.inter(
+                    fontSize: isDesktop ? 14 : 11,
+                    fontWeight: FontWeight.w400,
+                    color: isDark
+                        ? const Color(0xFFa0aec0)
+                        : const Color(0xFF64748b),
+                    height: isDesktop ? 1.5 : 1.3,
+                  ),
+                ),
+                SizedBox(height: isDesktop ? 12 : 6),
+
+                // Achievements
+                ...experience.achievements.map(
+                  (achievement) => Padding(
+                    padding: EdgeInsets.only(bottom: isDesktop ? 6 : 3),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.check_circle,
+                          size: isDesktop ? 14 : 10,
+                          color: const Color(0xFF06b6d4),
+                        ),
+                        SizedBox(width: isDesktop ? 10 : 5),
+                        Expanded(
+                          child: Text(
+                            achievement,
+                            style: GoogleFonts.inter(
+                              fontSize: isDesktop ? 13 : 10,
+                              fontWeight: FontWeight.w400,
+                              color: isDark
+                                  ? const Color(0xFFa0aec0)
+                                  : const Color(0xFF64748b),
+                              height: isDesktop ? 1.4 : 1.25,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -750,116 +798,181 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Project Image
-          Expanded(
-            flex: 2,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-              child: Container(
-                width: double.infinity,
-                color: const Color(0xFF2d3748),
-                child: project.imageUrl != null
-                    ? Image.asset(
-                        project.imageUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: Icon(
-                              Icons.image_outlined,
-                              size: 64,
-                              color: Color(0xFF4a5568),
-                            ),
-                          );
-                        },
-                      )
-                    : const Center(
-                        child: Icon(
-                          Icons.code,
-                          size: 64,
-                          color: Color(0xFF4a5568),
-                        ),
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
+            ),
+            child: Container(
+              width: double.infinity,
+              height: 180,
+              color: const Color(0xFF2d3748),
+              child: project.imageUrl != null
+                  ? Image.asset(
+                      project.imageUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                          child: Icon(
+                            Icons.image_outlined,
+                            size: 64,
+                            color: Color(0xFF4a5568),
+                          ),
+                        );
+                      },
+                    )
+                  : const Center(
+                      child: Icon(
+                        Icons.code,
+                        size: 64,
+                        color: Color(0xFF4a5568),
                       ),
-              ),
+                    ),
             ),
           ),
 
           // Project Info
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.code,
-                        size: 16,
-                        color: Color(0xFF06b6d4),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          project.title,
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.code, size: 16, color: Color(0xFF06b6d4)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        project.title,
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: Text(
-                      project.description,
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: isDark
-                            ? const Color(0xFFa0aec0)
-                            : const Color(0xFF64748b),
-                        height: 1.4,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  project.description,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: isDark
+                        ? const Color(0xFFa0aec0)
+                        : const Color(0xFF64748b),
+                    height: 1.4,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: project.technologies.take(3).map((tech) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF06b6d4).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        tech,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF06b6d4),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                // Testing and Play Store buttons
+                if (project.testingGroupUrl != null ||
+                    project.playStoreUrl != null) ...[
                   const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: project.technologies.take(3).map((tech) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
+                  // Note for closed testing
+                  if (project.testingGroupUrl != null &&
+                      project.playStoreUrl != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 6,
+                      ),
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF06b6d4).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: const Color(0xFF06b6d4).withOpacity(0.3),
+                          width: 1,
                         ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF06b6d4).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          tech,
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 12,
                             color: const Color(0xFF06b6d4),
                           ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              'To install this game, make sure you already join the Group Test',
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: isDark
+                                    ? const Color(0xFF06b6d4)
+                                    : const Color(0xFF0891b2),
+                                height: 1.3,
+                              ),
+                              softWrap: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  Row(
+                    children: [
+                      if (project.testingGroupUrl != null)
+                        Expanded(
+                          child: _buildProjectButton(
+                            label: 'Join Test',
+                            icon: Icons.group_add,
+                            onPressed: () =>
+                                _launchUrl(project.testingGroupUrl!),
+                            isDark: isDark,
+                          ),
                         ),
-                      );
-                    }).toList(),
+                      if (project.testingGroupUrl != null &&
+                          project.playStoreUrl != null)
+                        const SizedBox(width: 8),
+                      if (project.playStoreUrl != null)
+                        Expanded(
+                          child: _buildProjectButton(
+                            label: 'Play Store',
+                            icon: Icons.android,
+                            onPressed: () => _launchUrl(project.playStoreUrl!),
+                            isDark: isDark,
+                          ),
+                        ),
+                    ],
                   ),
                 ],
-              ),
+              ],
             ),
           ),
         ],
@@ -884,10 +997,7 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
             decoration: BoxDecoration(
               color: Colors.transparent,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white,
-                width: 2,
-              ),
+              border: Border.all(color: Colors.white, width: 2),
             ),
             child: Icon(icon, color: Colors.white, size: 28),
           ),
@@ -913,10 +1023,7 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
             decoration: BoxDecoration(
               color: Colors.transparent,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white,
-                width: 2,
-              ),
+              border: Border.all(color: Colors.white, width: 2),
             ),
             padding: const EdgeInsets.all(10),
             child: Image.asset(
@@ -967,6 +1074,27 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         side: BorderSide(color: Colors.white.withOpacity(0.2), width: 1),
         textStyle: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
+  Widget _buildProjectButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required bool isDark,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 12),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF06b6d4),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        elevation: 0,
+        textStyle: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600),
       ),
     );
   }

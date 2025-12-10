@@ -4,15 +4,16 @@ class WorkExperienceData {
   static final List<WorkExperience> experiences = [
     WorkExperience(
       id: '1',
-      position: 'Flutter Developer',
+      position: 'App Developer',
       company: 'Vantage Point Security',
       startDate: 'Aug 2025',
       endDate: 'Present',
       isPresent: true,
       description: 'Full-time • Singapore • Remote',
       achievements: [
-        'Developing cross-platform websites using Flutter',
-        'Working with Redis for data caching and management',
+        'Created automation scripts to simplify and speed up the creation of import files for migration processes.',
+        'Managed internal and portal applications, monitoring performance, identifying issues, and coordinating fixes end to end.',
+        'Collaborated closely with developer and consultant teams across regions, ensuring alignment, smooth handovers, and timely delivery',
       ],
     ),
     WorkExperience(

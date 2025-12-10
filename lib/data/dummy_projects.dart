@@ -36,6 +36,19 @@ class DummyProjects {
       githubUrl: 'https://github.com/jesselynhartandi/password-manager',
       imageUrl: 'assets/password_manager.png',
     ),
+    Project(
+      id: '4',
+      title: 'Luma Blocks',
+      description:
+          'a simple Tetris-inspired block game with four buttons that gives a little "mini console" feeling.',
+      technologies: ['Flutter'],
+      category: ProjectCategory.game,
+      completedDate: DateTime(2025, 12, 10),
+      imageUrl: 'assets/luma_blocks.png',
+      testingGroupUrl: 'https://groups.google.com/g/luma-blocks-testers',
+      playStoreUrl:
+          'https://play.google.com/store/apps/details?id=com.javes.block_app',
+    ),
   ];
 
   static List<Project> getProjectsByCategory(ProjectCategory category) {
