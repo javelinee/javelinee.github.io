@@ -167,7 +167,9 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
                       const SizedBox(height: 32),
 
                       // Action Buttons
-                      Row(
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 12,
                         children: [
                           _buildPrimaryButton(
                             label: 'Get in touch',
@@ -176,7 +178,6 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
                               'mailto:${ContactInfo.personal.email}',
                             ),
                           ),
-                          const SizedBox(width: 16),
                           _buildSecondaryButton(
                             label: 'LinkedIn',
                             icon: Icons.work_outline,
@@ -184,12 +185,18 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
                               ContactInfo.personal.linkedinUrl ?? '',
                             ),
                           ),
-                          const SizedBox(width: 16),
                           _buildSecondaryButton(
                             label: 'GitHub',
                             icon: Icons.code,
                             onPressed: () => _launchUrl(
                               ContactInfo.personal.githubUrl ?? '',
+                            ),
+                          ),
+                          _buildSecondaryButton(
+                            label: 'Medium',
+                            icon: Icons.article_outlined,
+                            onPressed: () => _launchUrl(
+                              ContactInfo.personal.mediumUrl ?? '',
                             ),
                           ),
                         ],
@@ -303,6 +310,16 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: _buildSecondaryButton(
+                        label: 'Medium',
+                        icon: Icons.article_outlined,
+                        onPressed: () =>
+                            _launchUrl(ContactInfo.personal.mediumUrl ?? ''),
+                      ),
                     ),
                   ],
                 ),
@@ -548,227 +565,192 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Timeline indicator
-        Container(
-          width: isDesktop ? 16 : 8,
-          height: isDesktop ? 16 : 8,
-          margin: EdgeInsets.only(top: 4),
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0xFF06b6d4),
-          ),
+    return Container(
+      margin: EdgeInsets.only(bottom: isDesktop ? 48 : 20),
+      padding: EdgeInsets.all(isDesktop ? 18 : 10),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1b263b) : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.05)
+              : const Color(0xFFe2e8f0),
+          width: 1,
         ),
-        SizedBox(width: isDesktop ? 24 : 10),
-
-        // Content
-        Expanded(
-          child: Container(
-            margin: EdgeInsets.only(bottom: isDesktop ? 48 : 20),
-            padding: EdgeInsets.all(isDesktop ? 18 : 10),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1b263b) : Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : const Color(0xFFe2e8f0),
-                width: 1,
-              ),
-              boxShadow: isDark
-                  ? null
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Responsive header layout
-                isDesktop
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  experience.position,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  experience.company,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: isDark
-                                        ? const Color(0xFF718096)
-                                        : const Color(0xFF64748b),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.05)
-                                  : const Color(0xFFf1f5f9),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.calendar_today,
-                                  size: 14,
-                                  color: isDark
-                                      ? const Color(0xFF718096)
-                                      : const Color(0xFF64748b),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '${experience.startDate} - ${experience.endDate}',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: isDark
-                                        ? const Color(0xFF718096)
-                                        : const Color(0xFF64748b),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    : Column(
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Responsive header layout
+          isDesktop
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             experience.position,
                             style: GoogleFonts.inter(
-                              fontSize: 15,
+                              fontSize: 20,
                               fontWeight: FontWeight.w600,
                               color: theme.colorScheme.onSurface,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 4),
                           Text(
                             experience.company,
                             style: GoogleFonts.inter(
-                              fontSize: 12,
+                              fontSize: 16,
                               fontWeight: FontWeight.w400,
                               color: isDark
                                   ? const Color(0xFF718096)
                                   : const Color(0xFF64748b),
                             ),
                           ),
-                          const SizedBox(height: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withOpacity(0.05)
+                            : const Color(0xFFf1f5f9),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.calendar_today,
+                            size: 14,
+                            color: isDark
+                                ? const Color(0xFF718096)
+                                : const Color(0xFF64748b),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${experience.startDate} - ${experience.endDate}',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                               color: isDark
-                                  ? Colors.white.withOpacity(0.05)
-                                  : const Color(0xFFf1f5f9),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.calendar_today,
-                                  size: 10,
-                                  color: isDark
-                                      ? const Color(0xFF718096)
-                                      : const Color(0xFF64748b),
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  '${experience.startDate} - ${experience.endDate}',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w500,
-                                    color: isDark
-                                        ? const Color(0xFF718096)
-                                        : const Color(0xFF64748b),
-                                  ),
-                                ),
-                              ],
+                                  ? const Color(0xFF718096)
+                                  : const Color(0xFF64748b),
                             ),
                           ),
                         ],
                       ),
-                SizedBox(height: isDesktop ? 12 : 6),
-                Text(
-                  experience.description,
-                  style: GoogleFonts.inter(
-                    fontSize: isDesktop ? 14 : 11,
-                    fontWeight: FontWeight.w400,
-                    color: isDark
-                        ? const Color(0xFFa0aec0)
-                        : const Color(0xFF64748b),
-                    height: isDesktop ? 1.5 : 1.3,
-                  ),
-                ),
-                SizedBox(height: isDesktop ? 12 : 6),
-
-                // Achievements
-                ...experience.achievements.map(
-                  (achievement) => Padding(
-                    padding: EdgeInsets.only(bottom: isDesktop ? 6 : 3),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.check_circle,
-                          size: isDesktop ? 14 : 10,
-                          color: const Color(0xFF06b6d4),
-                        ),
-                        SizedBox(width: isDesktop ? 10 : 5),
-                        Expanded(
-                          child: Text(
-                            achievement,
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      experience.position,
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      experience.company,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: isDark
+                            ? const Color(0xFF718096)
+                            : const Color(0xFF64748b),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withOpacity(0.05)
+                            : const Color(0xFFf1f5f9),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.calendar_today,
+                            size: 10,
+                            color: isDark
+                                ? const Color(0xFF718096)
+                                : const Color(0xFF64748b),
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${experience.startDate} - ${experience.endDate}',
                             style: GoogleFonts.inter(
-                              fontSize: isDesktop ? 13 : 10,
-                              fontWeight: FontWeight.w400,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
                               color: isDark
-                                  ? const Color(0xFFa0aec0)
+                                  ? const Color(0xFF718096)
                                   : const Color(0xFF64748b),
-                              height: isDesktop ? 1.4 : 1.25,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+          SizedBox(height: isDesktop ? 12 : 6),
+          Text(
+            experience.description,
+            style: GoogleFonts.inter(
+              fontSize: isDesktop ? 14 : 11,
+              fontWeight: FontWeight.w400,
+              color: isDark ? const Color(0xFFa0aec0) : const Color(0xFF64748b),
+              height: isDesktop ? 1.5 : 1.3,
             ),
           ),
-        ),
-      ],
+          SizedBox(height: isDesktop ? 12 : 6),
+
+          // Achievements
+          ...experience.achievements.map(
+            (achievement) => Padding(
+              padding: EdgeInsets.only(bottom: isDesktop ? 6 : 3),
+              child: Text(
+                achievement,
+                style: GoogleFonts.inter(
+                  fontSize: isDesktop ? 13 : 10,
+                  fontWeight: FontWeight.w400,
+                  color: isDark
+                      ? const Color(0xFFa0aec0)
+                      : const Color(0xFF64748b),
+                  height: isDesktop ? 1.4 : 1.25,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
