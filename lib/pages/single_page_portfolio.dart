@@ -5,6 +5,7 @@ import '../models/contact_info.dart';
 import '../data/work_experience_data.dart';
 import '../data/dummy_projects.dart';
 import '../models/project.dart';
+import '../utils/responsive_breakpoints.dart';
 
 class SinglePagePortfolio extends StatefulWidget {
   const SinglePagePortfolio({super.key});
@@ -17,6 +18,26 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
   final GlobalKey experienceKey = GlobalKey();
   final GlobalKey projectsKey = GlobalKey();
   final GlobalKey contactKey = GlobalKey();
+
+  double _contentMaxWidth(BuildContext context) {
+    if (!ResponsiveBreakpoints.isDesktopUp(context)) return double.infinity;
+    return ResponsiveBreakpoints.isWideUp(context) ? 1200.0 : 1100.0;
+  }
+
+  EdgeInsets _sectionPadding(
+    BuildContext context, {
+    double top = 26,
+    double bottom = 26,
+  }) {
+    final isDesktop = ResponsiveBreakpoints.isDesktopUp(context);
+    final horizontal = isDesktop ? 56.0 : 20.0;
+    return EdgeInsets.only(
+      left: horizontal,
+      right: horizontal,
+      top: top,
+      bottom: bottom,
+    );
+  }
 
   void scrollToExperience() {
     _scrollToSection(experienceKey);
@@ -49,7 +70,7 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
     return Scaffold(
       backgroundColor: isDark
           ? const Color(0xFF0a1628)
-          : const Color(0xFFF5F5F7),
+          : const Color(0xFFF6F8FC),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -74,359 +95,1000 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
   }
 
   Widget _buildHeroSection(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final isDesktop = MediaQuery.of(context).size.width > 900;
+    final isDesktop = ResponsiveBreakpoints.isDesktopUp(context);
+
+    final maxWidth = _contentMaxWidth(context);
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.only(
-        left: isDesktop ? 80 : 24,
-        right: isDesktop ? 80 : 24,
-        top: isDesktop ? 50 : 40,
-        bottom: isDesktop ? 30 : 24,
-      ),
-      child: isDesktop
-          ? Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Profile Picture
-                Container(
-                  width: 180,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
-                      width: 3,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/me.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: const Color(0xFF1b263b),
-                          child: const Icon(
-                            Icons.person,
-                            size: 90,
-                            color: Color(0xFF4a5568),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 60),
-
-                // Text Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      padding: _sectionPadding(context, top: isDesktop ? 28 : 20, bottom: 12),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: isDesktop
+              ? IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        ContactInfo.personal.name,
-                        style: GoogleFonts.inter(
-                          fontSize: 40,
-                          fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.onSurface,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        ContactInfo.personal.title,
-                        style: GoogleFonts.inter(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF06b6d4),
-                          height: 1.4,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        ContactInfo.personal.shortBio ??
-                            ContactInfo.personal.bio,
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: isDark
-                              ? const Color(0xFFa0aec0)
-                              : const Color(0xFF64748b),
-                          height: 1.6,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-
-                      // Action Buttons
-                      Wrap(
-                        spacing: 16,
-                        runSpacing: 12,
-                        children: [
-                          _buildPrimaryButton(
-                            label: 'Get in touch',
-                            icon: Icons.email_outlined,
-                            onPressed: () => _launchUrl(
-                              'mailto:${ContactInfo.personal.email}',
-                            ),
-                          ),
-                          _buildSecondaryButton(
-                            label: 'LinkedIn',
-                            icon: Icons.work_outline,
-                            onPressed: () => _launchUrl(
-                              ContactInfo.personal.linkedinUrl ?? '',
-                            ),
-                          ),
-                          _buildSecondaryButton(
-                            label: 'GitHub',
-                            icon: Icons.code,
-                            onPressed: () => _launchUrl(
-                              ContactInfo.personal.githubUrl ?? '',
-                            ),
-                          ),
-                          _buildSecondaryButton(
-                            label: 'Medium',
-                            icon: Icons.article_outlined,
-                            onPressed: () => _launchUrl(
-                              ContactInfo.personal.mediumUrl ?? '',
-                            ),
-                          ),
-                        ],
-                      ),
+                      Expanded(flex: 3, child: _buildProfileHeroCard(context)),
+                      const SizedBox(width: 24),
+                      Expanded(flex: 2, child: _buildAvailabilityCard(context)),
                     ],
                   ),
+                )
+              : Column(
+                  children: [
+                    _buildProfileHeroCard(context),
+                    const SizedBox(height: 16),
+                    _buildAvailabilityCard(context),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeroCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF101a2c) : Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.06)
+              : const Color(0xFFE6ECF5),
+        ),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
               ],
-            )
-          : Column(
-              children: [
-                // Profile Picture
-                Container(
-                  width: 140,
-                  height: 140,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
-                      width: 3,
-                    ),
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/me.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: const Color(0xFF1b263b),
-                          child: const Icon(
-                            Icons.person,
-                            size: 70,
-                            color: Color(0xFF4a5568),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Text Content
-                Text(
-                  ContactInfo.personal.name,
-                  style: GoogleFonts.inter(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.onSurface,
-                    height: 1.2,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  ContactInfo.personal.title,
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF06b6d4),
-                    height: 1.4,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  ContactInfo.personal.shortBio ?? ContactInfo.personal.bio,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: isDark
-                        ? const Color(0xFFa0aec0)
-                        : const Color(0xFF64748b),
-                    height: 1.6,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 32),
-
-                // Action Buttons (Stacked on mobile)
-                Column(
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: _buildPrimaryButton(
-                        label: 'Get in touch',
-                        icon: Icons.email_outlined,
-                        onPressed: () =>
-                            _launchUrl('mailto:${ContactInfo.personal.email}'),
+      ),
+      child: Stack(
+        children: [
+          // Faint watermark icon
+          Positioned(
+            right: -10,
+            top: -10,
+            child: Icon(
+              Icons.data_usage_outlined,
+              size: 110,
+              color: isDark
+                  ? Colors.white.withOpacity(0.035)
+                  : const Color(0xFF2563EB).withOpacity(0.05),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 54,
+                    height: 54,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withOpacity(0.08)
+                            : const Color(0xFFE6ECF5),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildSecondaryButton(
-                            label: 'LinkedIn',
-                            icon: Icons.work_outline,
-                            onPressed: () => _launchUrl(
-                              ContactInfo.personal.linkedinUrl ?? '',
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/me.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: isDark
+                                ? const Color(0xFF1b263b)
+                                : const Color(0xFFF1F5F9),
+                            child: Icon(
+                              Icons.person,
+                              size: 28,
+                              color: theme.colorScheme.onSurface.withOpacity(0.45),
                             ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ContactInfo.personal.name,
+                          style: GoogleFonts.inter(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
+                            color: theme.colorScheme.onSurface,
+                            height: 1.1,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildSecondaryButton(
-                            label: 'GitHub',
-                            icon: Icons.code,
-                            onPressed: () => _launchUrl(
-                              ContactInfo.personal.githubUrl ?? '',
-                            ),
+                        const SizedBox(height: 6),
+                        Text(
+                          ContactInfo.personal.title,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? const Color(0xFF93C5FD)
+                                : const Color(0xFF2563EB),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: _buildSecondaryButton(
-                        label: 'Medium',
-                        icon: Icons.article_outlined,
-                        onPressed: () =>
-                            _launchUrl(ContactInfo.personal.mediumUrl ?? ''),
-                      ),
-                    ),
-                  ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Text(
+                ContactInfo.personal.shortBio ?? ContactInfo.personal.bio,
+                style: GoogleFonts.inter(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w400,
+                  color: isDark ? const Color(0xFFa0aec0) : const Color(0xFF64748b),
+                  height: 1.6,
+                ),
+              ),
+              const Spacer(),
+              _buildPrimaryButton(
+                label: 'View Projects',
+                icon: Icons.rocket_launch_outlined,
+                onPressed: scrollToProjects,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvailabilityCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    Widget chip(String label) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withOpacity(0.06)
+              : const Color(0xFFF1F5FF),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withOpacity(0.06)
+                : const Color(0xFFE6ECF5),
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface.withOpacity(0.75),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF101a2c) : Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.06)
+              : const Color(0xFFE6ECF5),
+        ),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
               ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withOpacity(0.06)
+                      : const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.hub_outlined,
+                  size: 18,
+                  color: isDark
+                      ? const Color(0xFF93C5FD)
+                      : const Color(0xFF2563EB),
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF1d4ed8).withOpacity(0.25)
+                      : const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0xFF2563EB).withOpacity(0.4)
+                        : const Color(0xFFBFDBFE),
+                  ),
+                ),
+                child: Text(
+                  'SOFTWARE ENGINEER',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    color: isDark
+                        ? const Color(0xFF93C5FD)
+                        : const Color(0xFF2563EB),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Professional Networking',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: theme.colorScheme.onSurface,
             ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Building connections and sharing insights in the mobile development ecosystem.',
+            style: GoogleFonts.inter(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w400,
+              color: isDark
+                  ? const Color(0xFFa0aec0)
+                  : const Color(0xFF64748b),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'CORE EXPERTISE',
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.6,
+              color: theme.colorScheme.onSurface.withOpacity(0.55),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              chip('Flutter'),
+              chip('Dart'),
+              chip('Firebase'),
+              chip('REST APIs'),
+              chip('Node.js'),
+              chip('State Management'),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildWorkExperienceSection(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final isDesktop = MediaQuery.of(context).size.width > 900;
     final experiences = WorkExperienceData.getExperiences();
+    final maxWidth = _contentMaxWidth(context);
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.only(
-        left: isDesktop ? 80 : 24,
-        right: isDesktop ? 80 : 24,
-        top: 40,
-        bottom: 40,
+      padding: _sectionPadding(context, top: 26, bottom: 26),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionHeader(
+                context,
+                icon: Icons.work_outline,
+                title: 'Professional Experience',
+              ),
+              const SizedBox(height: 16),
+              _buildExperienceCard(context, experiences: experiences),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Row(
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: isDark
+                ? Colors.white.withOpacity(0.06)
+                : const Color(0xFFEFF6FF),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            size: 16,
+            color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF2563EB),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExperienceCard(
+    BuildContext context, {
+    required List experiences,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final isDesktop = ResponsiveBreakpoints.isDesktopUp(context);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: isDesktop ? 18 : 14,
+        vertical: isDesktop ? 14 : 12,
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF101a2c) : Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.06)
+              : const Color(0xFFE6ECF5),
+        ),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Work Experience',
+          for (int i = 0; i < experiences.length; i++) ...[
+            _buildExperienceRow(context, experience: experiences[i]),
+            if (i != experiences.length - 1) ...[
+              const SizedBox(height: 10),
+              Divider(
+                height: 1,
+                color: isDark
+                    ? Colors.white.withOpacity(0.06)
+                    : const Color(0xFFE6ECF5),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExperienceRow(
+    BuildContext context, {
+    required dynamic experience,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final isDesktop = ResponsiveBreakpoints.isDesktopUp(context);
+
+    final dateText = experience.isPresent == true
+        ? '${experience.startDate} — Present'
+        : '${experience.startDate} — ${experience.endDate}';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: isDesktop ? 170 : 120,
+          child: Text(
+            dateText,
             style: GoogleFonts.inter(
-              fontSize: isDesktop ? 36 : 28,
+              fontSize: isDesktop ? 12.5 : 11.5,
               fontWeight: FontWeight.w700,
-              color: theme.colorScheme.onSurface,
+              color: theme.colorScheme.onSurface.withOpacity(0.55),
             ),
           ),
-          const SizedBox(height: 40),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      experience.company,
+                      style: GoogleFonts.inter(
+                        fontSize: isDesktop ? 15 : 14,
+                        fontWeight: FontWeight.w800,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                experience.position,
+                style: GoogleFonts.inter(
+                  fontSize: isDesktop ? 13.5 : 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: isDark
+                      ? const Color(0xFF93C5FD)
+                      : const Color(0xFF2563EB),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                experience.description,
+                style: GoogleFonts.inter(
+                  fontSize: isDesktop ? 12.8 : 12.2,
+                  fontWeight: FontWeight.w500,
+                  color: isDark
+                      ? const Color(0xFFa0aec0)
+                      : const Color(0xFF64748b),
+                  height: 1.35,
+                ),
+              ),
+              const SizedBox(height: 10),
+              ...experience.achievements
+                  .take(isDesktop ? 3 : 2)
+                  .map<Widget>(
+                    (a) => Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Container(
+                              width: 5,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.35,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              a,
+                              style: GoogleFonts.inter(
+                                fontSize: isDesktop ? 12.5 : 12,
+                                fontWeight: FontWeight.w400,
+                                color: isDark
+                                    ? const Color(0xFFa0aec0)
+                                    : const Color(0xFF64748b),
+                                height: 1.45,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
-          // Timeline
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: experiences.length,
-            itemBuilder: (context, index) {
-              final experience = experiences[index];
-              final isLast = index == experiences.length - 1;
+  // ── bento card helpers ───────────────────────────────────────────────────
 
-              return _buildExperienceItem(
-                context: context,
-                experience: experience,
-                isLast: isLast,
-                isDesktop: isDesktop,
-              );
-            },
+  BoxDecoration _cardDeco(bool isDark) => BoxDecoration(
+        color: isDark ? const Color(0xFF101a2c) : Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.06)
+              : const Color(0xFFE6ECF5),
+        ),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+      );
+
+  /// Hero card — stretches to fill parent height, image covers background,
+  /// project info as a gradient overlay pinned to the bottom.
+  Widget _projectHeroCard(BuildContext context, Project p) {
+    final bg = p.backgroundColor ?? const Color(0xFF1A1A2E);
+    final url = p.playStoreUrl ?? p.driveUrl ?? p.githubUrl ?? p.liveUrl;
+
+    Widget chip(String label) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: Colors.white.withOpacity(0.3)),
+          ),
+          child: Text(
+            label.toUpperCase(),
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+              color: Colors.white,
+            ),
+          ),
+        );
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        color: bg,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (p.imageUrl != null)
+              Image.asset(
+                p.imageUrl!,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const SizedBox(),
+              ),
+            // Gradient overlay for text legibility
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0.45, 1.0],
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.80),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Text pinned to bottom
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      p.title,
+                      style: GoogleFonts.inter(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      p.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: Colors.white.withOpacity(0.82),
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: p.technologies.map(chip).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Link icon top-right
+            if (url != null)
+              Positioned(
+                top: 14,
+                right: 14,
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () => _launchUrl(url),
+                    child: Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.open_in_new,
+                          size: 15,
+                          color: Colors.white.withOpacity(0.9)),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Combined card — coloured image on top, title + description + tags below,
+  /// all inside one rounded card container.
+  Widget _projectCombinedCard(BuildContext context, Project p,
+      {double imageHeight = 170}) {
+    final bg = p.backgroundColor ?? const Color(0xFF4F46E5);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final url = p.driveUrl ?? p.githubUrl ?? p.playStoreUrl ?? p.liveUrl;
+
+    Widget chip(String label) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withOpacity(0.12)
+                  : const Color(0xFFCBD5E1),
+            ),
+          ),
+          child: Text(
+            label.toUpperCase(),
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+              color: isDark
+                  ? Colors.white.withOpacity(0.55)
+                  : const Color(0xFF64748b),
+            ),
+          ),
+        );
+
+    return Container(
+      decoration: _cardDeco(isDark),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: imageHeight,
+            width: double.infinity,
+            color: bg,
+            child: p.imageUrl != null
+                ? Image.asset(
+                    p.imageUrl!,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => Center(
+                          child: Icon(Icons.image_outlined,
+                              size: 40, color: Colors.white.withOpacity(0.4)),
+                        ))
+                : Center(
+                    child: Icon(Icons.code,
+                        size: 40, color: Colors.white.withOpacity(0.4))),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        p.title,
+                        style: GoogleFonts.inter(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: theme.colorScheme.onSurface,
+                          height: 1.2,
+                        ),
+                      ),
+                    ),
+                    if (url != null)
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () => _launchUrl(url),
+                          child: Icon(Icons.open_in_new,
+                              size: 17,
+                              color: theme.colorScheme.onSurface
+                                  .withOpacity(0.35)),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  p.description,
+                  style: GoogleFonts.inter(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w400,
+                    color: isDark
+                        ? const Color(0xFFa0aec0)
+                        : const Color(0xFF64748b),
+                    height: 1.55,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: p.technologies.map(chip).toList(),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProjectsSection(BuildContext context) {
+  /// Small card — icon tile, title, description, category + arrow.
+  Widget _projectMiniCard(BuildContext context, Project p) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final isDesktop = MediaQuery.of(context).size.width > 900;
+    final bg = p.backgroundColor ?? const Color(0xFF4F46E5);
+    final url = p.driveUrl ?? p.githubUrl ?? p.liveUrl ?? p.playStoreUrl;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: _cardDeco(isDark),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: bg.withOpacity(isDark ? 0.28 : 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: p.imageUrl != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(p.imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            Icon(Icons.code, size: 20, color: bg)),
+                  )
+                : Icon(Icons.code, size: 20, color: bg),
+          ),
+          const SizedBox(height: 14),
+          Text(p.title,
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: theme.colorScheme.onSurface,
+              )),
+          const SizedBox(height: 6),
+          Text(p.description,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: isDark
+                    ? const Color(0xFFa0aec0)
+                    : const Color(0xFF64748b),
+                height: 1.5,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis),
+          const Spacer(),
+          const SizedBox(height: 14),
+          Row(children: [
+            Text(p.category.displayName.toUpperCase(),
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.6,
+                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                )),
+            const Spacer(),
+            GestureDetector(
+              onTap: url != null ? () => _launchUrl(url) : null,
+              child: MouseRegion(
+                cursor: url != null
+                    ? SystemMouseCursors.click
+                    : SystemMouseCursors.basic,
+                child: Icon(Icons.arrow_forward,
+                    size: 16,
+                    color: theme.colorScheme.onSurface
+                        .withOpacity(url != null ? 0.45 : 0.18)),
+              ),
+            ),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  // ── projects section ──────────────────────────────────────────────────────
+
+  Widget _buildProjectsSection(BuildContext context) {
     final projects = DummyProjects.projects;
+    final maxWidth = _contentMaxWidth(context);
+    final isDesktop = ResponsiveBreakpoints.isDesktopUp(context);
+    final isTablet = ResponsiveBreakpoints.isTabletUp(context);
+    const gap = 16.0;
+
+    // Desktop bento (Luma Blocks is the hero):
+    //  [Luma hero card TALL      ]  [UriBook combined (image+text)  ]
+    //  [   (spans both rows)     ]  [Tournal combined  ] [PwdMgr mini]
+    final luma = projects[3];
+    final uriBook = projects[0];
+    final tournal = projects[1];
+    final pwdMgr = projects[2];
+
+    Widget desktopBento() => IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Left: Luma Blocks — tall hero with gradient text overlay
+              Expanded(child: _projectHeroCard(context, luma)),
+              const SizedBox(width: gap),
+              // Right 2/3: 2-row grid
+              Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Row 1: UriBook as a single combined card (image + text)
+                    _projectCombinedCard(context, uriBook, imageHeight: 190),
+                    const SizedBox(height: gap),
+                    // Row 2: Tournal mini + PwdMgr mini
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                              child: _projectMiniCard(context, tournal)),
+                          const SizedBox(width: gap),
+                          Expanded(
+                              child: _projectMiniCard(context, pwdMgr)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+
+    // Tablet (2-col): each project gets its own combined card
+    Widget tabletGrid() => Column(
+          children: [
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                      child: _projectCombinedCard(context, luma,
+                          imageHeight: 160)),
+                  const SizedBox(width: gap),
+                  Expanded(
+                      child: _projectCombinedCard(context, uriBook,
+                          imageHeight: 160)),
+                ],
+              ),
+            ),
+            const SizedBox(height: gap),
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: _projectMiniCard(context, tournal)),
+                  const SizedBox(width: gap),
+                  Expanded(child: _projectMiniCard(context, pwdMgr)),
+                ],
+              ),
+            ),
+          ],
+        );
+
+    // Mobile — stacked (Luma first), each as combined card
+    Widget mobileList() => Column(
+          children: [
+            for (final p in [luma, uriBook]) ...[
+              _projectCombinedCard(context, p, imageHeight: 180),
+              const SizedBox(height: gap),
+            ],
+            for (final p in [tournal, pwdMgr]) ...[
+              _projectMiniCard(context, p),
+              if (p != pwdMgr) const SizedBox(height: gap),
+            ],
+          ],
+        );
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.only(
-        left: isDesktop ? 80 : 24,
-        right: isDesktop ? 80 : 24,
-        bottom: 40,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Featured Projects',
-            style: GoogleFonts.inter(
-              fontSize: isDesktop ? 36 : 28,
-              fontWeight: FontWeight.w700,
-              color: theme.colorScheme.onSurface,
-            ),
+      padding: _sectionPadding(context, top: 26, bottom: 26),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionHeader(context,
+                  icon: Icons.folder_outlined, title: 'Featured Projects'),
+              const SizedBox(height: 16),
+              if (isDesktop)
+                desktopBento()
+              else if (isTablet)
+                tabletGrid()
+              else
+                mobileList(),
+            ],
           ),
-          const SizedBox(height: 40),
-
-          // Projects Grid
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final cardWidth = constraints.maxWidth > 1200
-                  ? (constraints.maxWidth - 48) / 3
-                  : constraints.maxWidth > 600
-                  ? (constraints.maxWidth - 24) / 2
-                  : constraints.maxWidth;
-
-              return Wrap(
-                spacing: 24,
-                runSpacing: 24,
-                children: projects
-                    .map(
-                      (project) => SizedBox(
-                        width: cardWidth,
-                        child: _buildProjectCard(context, project),
-                      ),
-                    )
-                    .toList(),
-              );
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -434,590 +1096,344 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
   Widget _buildContactSection(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final isDesktop = MediaQuery.of(context).size.width > 900;
+    final maxWidth = _contentMaxWidth(context);
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.only(
-        left: isDesktop ? 80 : 24,
-        right: isDesktop ? 80 : 24,
-        top: 40,
-        bottom: 40,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Large Contact Card
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(48),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF14b8a6), Color(0xFF0891b2)],
+      padding: _sectionPadding(context, top: 26, bottom: 40),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildGetInTouchCard(context),
+
+              const SizedBox(height: 60),
+
+              // Footer
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '© ${DateTime.now().year} All rights reserved.',
+                      style: GoogleFonts.inter(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w500,
+                        color: isDark
+                            ? const Color(0xFF718096)
+                            : const Color(0xFF94a3b8),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGetInTouchCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final isDesktop = ResponsiveBreakpoints.isDesktopUp(context);
+
+    final cardColor = isDark ? const Color(0xFF101a2c) : Colors.white;
+    final cardBorder = isDark
+        ? Colors.white.withOpacity(0.06)
+        : const Color(0xFFE6ECF5);
+    final primary = isDark ? const Color(0xFF1D4ED8) : const Color(0xFF1E3A8A);
+    final subtitleColor = isDark
+        ? const Color(0xFFa0aec0)
+        : const Color(0xFF64748b);
+
+    Widget sayHelloButton({required bool expanded}) {
+      final child = ElevatedButton(
+        onPressed: () => _launchUrl(
+          'mailto:${ContactInfo.personal.email}?subject=Hello%20👋',
+        ),
+        style:
+            ElevatedButton.styleFrom(
+              backgroundColor: primary,
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(
+                horizontal: expanded ? 22 : 28,
+                vertical: 18,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(999),
+              ),
+              elevation: 0,
+              textStyle: GoogleFonts.inter(
+                fontSize: 15.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ).copyWith(
+              shadowColor: MaterialStatePropertyAll(
+                isDark ? Colors.transparent : primary.withOpacity(0.35),
+              ),
+            ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Say Hello'),
+            const SizedBox(width: 8),
+            Text('👋', style: GoogleFonts.inter(fontSize: 16)),
+          ],
+        ),
+      );
+
+      if (!expanded) return SizedBox(height: 52, child: child);
+      return SizedBox(width: double.infinity, height: 52, child: child);
+    }
+
+    Widget circleIconButton({
+      required Widget icon,
+      required String tooltip,
+      required VoidCallback onTap,
+    }) {
+      return Tooltip(
+        message: tooltip,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: onTap,
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withOpacity(0.06)
+                    : const Color(0xFFF8FAFF),
+                shape: BoxShape.circle,
+                border: Border.all(color: cardBorder),
+                boxShadow: isDark
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 14,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+              ),
+              child: Center(child: icon),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: isDesktop ? 44 : 22,
+        vertical: isDesktop ? 34 : 22,
+      ),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: cardBorder),
+        boxShadow: isDark
+            ? null
+            : [
                 BoxShadow(
-                  color: const Color(0xFF06b6d4).withOpacity(0.3),
-                  blurRadius: 30,
-                  offset: const Offset(0, 10),
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 26,
+                  offset: const Offset(0, 14),
                 ),
               ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      ),
+      child: isDesktop
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Get in Touch',
+                        style: GoogleFonts.inter(
+                          fontSize: 42,
+                          fontWeight: FontWeight.w900,
+                          color: theme.colorScheme.onSurface,
+                          height: 1.05,
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.send,
-                        color: Colors.white,
-                        size: 32,
+                      const SizedBox(height: 12),
+                      Text(
+                        "Have a project in mind? Let's discuss how we\ncan build something amazing together.",
+                        style: GoogleFonts.inter(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w500,
+                          color: subtitleColor,
+                          height: 1.55,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(height: 20),
+                      Row(
                         children: [
-                          Text(
-                            'Get in Touch',
-                            style: GoogleFonts.inter(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                          circleIconButton(
+                            icon: Icon(
+                              Icons.mail_outline,
+                              size: 18,
+                              color: theme.colorScheme.onSurface.withOpacity(
+                                isDark ? 0.75 : 0.65,
+                              ),
+                            ),
+                            tooltip: 'Email',
+                            onTap: () => _launchUrl(
+                              'mailto:${ContactInfo.personal.email}',
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'I\'m always interested in hearing about new projects and opportunities.',
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white.withOpacity(0.9),
+                          const SizedBox(width: 12),
+                          if ((ContactInfo.personal.linkedinUrl ?? '')
+                              .trim()
+                              .isNotEmpty)
+                            circleIconButton(
+                              icon: Icon(
+                                Icons.link,
+                                size: 18,
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  isDark ? 0.75 : 0.65,
+                                ),
+                              ),
+                              tooltip: 'LinkedIn',
+                              onTap: () =>
+                                  _launchUrl(ContactInfo.personal.linkedinUrl!),
                             ),
-                          ),
+                          const SizedBox(width: 12),
+                          if ((ContactInfo.personal.githubUrl ?? '')
+                              .trim()
+                              .isNotEmpty)
+                            circleIconButton(
+                              icon: Icon(
+                                Icons.people,
+                                size: 18,
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  isDark ? 0.75 : 0.65,
+                                ),
+                              ),
+                              tooltip: 'GitHub',
+                              onTap: () =>
+                                  _launchUrl(ContactInfo.personal.githubUrl!),
+                            ),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 40),
-
-                // Contact Icons
+                const SizedBox(width: 28),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: isDark
+                        ? null
+                        : [
+                            BoxShadow(
+                              color: primary.withOpacity(0.32),
+                              blurRadius: 28,
+                              offset: const Offset(0, 18),
+                            ),
+                          ],
+                  ),
+                  child: sayHelloButton(expanded: false),
+                ),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Get in Touch',
+                  style: GoogleFonts.inter(
+                    fontSize: 34,
+                    fontWeight: FontWeight.w900,
+                    color: theme.colorScheme.onSurface,
+                    height: 1.05,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "Have a project in mind? Let's discuss how we can build something amazing together.",
+                  style: GoogleFonts.inter(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w500,
+                    color: subtitleColor,
+                    height: 1.55,
+                  ),
+                ),
+                const SizedBox(height: 18),
                 Row(
                   children: [
-                    _buildContactIconButton(
-                      icon: Icons.email,
+                    circleIconButton(
+                      icon: Icon(
+                        Icons.mail_outline,
+                        size: 18,
+                        color: theme.colorScheme.onSurface.withOpacity(
+                          isDark ? 0.75 : 0.65,
+                        ),
+                      ),
                       tooltip: 'Email',
                       onTap: () =>
                           _launchUrl('mailto:${ContactInfo.personal.email}'),
                     ),
-                    const SizedBox(width: 16),
-                    if (ContactInfo.personal.linkedinUrl != null)
-                      _buildContactImageButton(
-                        imagePath: 'assets/linkedin_icon.png',
+                    const SizedBox(width: 12),
+                    if ((ContactInfo.personal.linkedinUrl ?? '')
+                        .trim()
+                        .isNotEmpty)
+                      circleIconButton(
+                        icon: Icon(
+                          Icons.link,
+                          size: 18,
+                          color: theme.colorScheme.onSurface.withOpacity(
+                            isDark ? 0.75 : 0.65,
+                          ),
+                        ),
                         tooltip: 'LinkedIn',
                         onTap: () =>
                             _launchUrl(ContactInfo.personal.linkedinUrl!),
                       ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 60),
-
-          // Footer
-          Center(
-            child: Text(
-              '© ${DateTime.now().year} All rights reserved.',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: isDark
-                    ? const Color(0xFF718096)
-                    : const Color(0xFF94a3b8),
-              ),
-            ),
-          ),
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExperienceItem({
-    required BuildContext context,
-    required experience,
-    required bool isLast,
-    required bool isDesktop,
-  }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Container(
-      margin: EdgeInsets.only(bottom: isDesktop ? 48 : 20),
-      padding: EdgeInsets.all(isDesktop ? 18 : 10),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1b263b) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.05)
-              : const Color(0xFFe2e8f0),
-          width: 1,
-        ),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Responsive header layout
-          isDesktop
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            experience.position,
-                            style: GoogleFonts.inter(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
-                            ),
+                    const SizedBox(width: 12),
+                    if ((ContactInfo.personal.githubUrl ?? '')
+                        .trim()
+                        .isNotEmpty)
+                      circleIconButton(
+                        icon: Icon(
+                          Icons.people,
+                          size: 18,
+                          color: theme.colorScheme.onSurface.withOpacity(
+                            isDark ? 0.75 : 0.65,
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            experience.company,
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: isDark
-                                  ? const Color(0xFF718096)
-                                  : const Color(0xFF64748b),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.white.withOpacity(0.05)
-                            : const Color(0xFFf1f5f9),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 14,
-                            color: isDark
-                                ? const Color(0xFF718096)
-                                : const Color(0xFF64748b),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            '${experience.startDate} - ${experience.endDate}',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: isDark
-                                  ? const Color(0xFF718096)
-                                  : const Color(0xFF64748b),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      experience.position,
-                      style: GoogleFonts.inter(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      experience.company,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: isDark
-                            ? const Color(0xFF718096)
-                            : const Color(0xFF64748b),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.white.withOpacity(0.05)
-                            : const Color(0xFFf1f5f9),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 10,
-                            color: isDark
-                                ? const Color(0xFF718096)
-                                : const Color(0xFF64748b),
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            '${experience.startDate} - ${experience.endDate}',
-                            style: GoogleFonts.inter(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                              color: isDark
-                                  ? const Color(0xFF718096)
-                                  : const Color(0xFF64748b),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-          SizedBox(height: isDesktop ? 12 : 6),
-          Text(
-            experience.description,
-            style: GoogleFonts.inter(
-              fontSize: isDesktop ? 14 : 11,
-              fontWeight: FontWeight.w400,
-              color: isDark ? const Color(0xFFa0aec0) : const Color(0xFF64748b),
-              height: isDesktop ? 1.5 : 1.3,
-            ),
-          ),
-          SizedBox(height: isDesktop ? 12 : 6),
-
-          // Achievements
-          ...experience.achievements.map(
-            (achievement) => Padding(
-              padding: EdgeInsets.only(bottom: isDesktop ? 6 : 3),
-              child: Text(
-                achievement,
-                style: GoogleFonts.inter(
-                  fontSize: isDesktop ? 13 : 10,
-                  fontWeight: FontWeight.w400,
-                  color: isDark
-                      ? const Color(0xFFa0aec0)
-                      : const Color(0xFF64748b),
-                  height: isDesktop ? 1.4 : 1.25,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProjectCard(BuildContext context, Project project) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1a1f29) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.05)
-              : const Color(0xFFe2e8f0),
-          width: 1,
-        ),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Project Image
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
-            child: Container(
-              width: double.infinity,
-              height: 180,
-              color: const Color(0xFF2d3748),
-              child: project.imageUrl != null
-                  ? Image.asset(
-                      project.imageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
-                          child: Icon(
-                            Icons.image_outlined,
-                            size: 64,
-                            color: Color(0xFF4a5568),
-                          ),
-                        );
-                      },
-                    )
-                  : const Center(
-                      child: Icon(
-                        Icons.code,
-                        size: 64,
-                        color: Color(0xFF4a5568),
-                      ),
-                    ),
-            ),
-          ),
-
-          // Project Info
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.code, size: 16, color: Color(0xFF06b6d4)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        project.title,
-                        style: GoogleFonts.inter(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        tooltip: 'GitHub',
+                        onTap: () =>
+                            _launchUrl(ContactInfo.personal.githubUrl!),
                       ),
-                    ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  project.description,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: isDark
-                        ? const Color(0xFFa0aec0)
-                        : const Color(0xFF64748b),
-                    height: 1.4,
+                const SizedBox(height: 18),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: isDark
+                        ? null
+                        : [
+                            BoxShadow(
+                              color: primary.withOpacity(0.32),
+                              blurRadius: 28,
+                              offset: const Offset(0, 18),
+                            ),
+                          ],
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  child: sayHelloButton(expanded: true),
                 ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: project.technologies.take(3).map((tech) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF06b6d4).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        tech,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xFF06b6d4),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                // Testing and Play Store buttons
-                if (project.testingGroupUrl != null ||
-                    project.playStoreUrl != null) ...[
-                  const SizedBox(height: 12),
-                  // Note for closed testing
-                  if (project.testingGroupUrl != null &&
-                      project.playStoreUrl != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
-                      ),
-                      margin: const EdgeInsets.only(bottom: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF06b6d4).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: const Color(0xFF06b6d4).withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            size: 12,
-                            color: const Color(0xFF06b6d4),
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              'To install this game, make sure you already join the Group Test',
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w500,
-                                color: isDark
-                                    ? const Color(0xFF06b6d4)
-                                    : const Color(0xFF0891b2),
-                                height: 1.3,
-                              ),
-                              softWrap: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  Row(
-                    children: [
-                      if (project.testingGroupUrl != null)
-                        Expanded(
-                          child: _buildProjectButton(
-                            label: 'Join Test',
-                            icon: Icons.group_add,
-                            onPressed: () =>
-                                _launchUrl(project.testingGroupUrl!),
-                            isDark: isDark,
-                          ),
-                        ),
-                      if (project.testingGroupUrl != null &&
-                          project.playStoreUrl != null)
-                        const SizedBox(width: 8),
-                      if (project.playStoreUrl != null)
-                        Expanded(
-                          child: _buildProjectButton(
-                            label: 'Play Store',
-                            icon: Icons.android,
-                            onPressed: () => _launchUrl(project.playStoreUrl!),
-                            isDark: isDark,
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContactIconButton({
-    required IconData icon,
-    required String tooltip,
-    required VoidCallback onTap,
-  }) {
-    return Tooltip(
-      message: tooltip,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2),
-            ),
-            child: Icon(icon, color: Colors.white, size: 28),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContactImageButton({
-    required String imagePath,
-    required String tooltip,
-    required VoidCallback onTap,
-  }) {
-    return Tooltip(
-      message: tooltip,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2),
-            ),
-            padding: const EdgeInsets.all(10),
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(Icons.link, color: Colors.white, size: 28);
-              },
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -1031,52 +1447,12 @@ class SinglePagePortfolioState extends State<SinglePagePortfolio> {
       icon: Icon(icon, size: 18),
       label: Text(label),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF06b6d4),
+        backgroundColor: const Color(0xFF1d4ed8),
         foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 0,
         textStyle: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
-      ),
-    );
-  }
-
-  Widget _buildSecondaryButton({
-    required String label,
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return OutlinedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 18),
-      label: Text(label),
-      style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFFa0aec0),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        side: BorderSide(color: Colors.white.withOpacity(0.2), width: 1),
-        textStyle: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
-      ),
-    );
-  }
-
-  Widget _buildProjectButton({
-    required String label,
-    required IconData icon,
-    required VoidCallback onPressed,
-    required bool isDark,
-  }) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 12),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF06b6d4),
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        elevation: 0,
-        textStyle: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600),
       ),
     );
   }

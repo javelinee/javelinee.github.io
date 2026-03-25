@@ -7,6 +7,7 @@ class ContactInfo {
   final String? linkedinUrl;
   final String? githubUrl;
   final String? mediumUrl;
+  final String? resumeUrl;
   final String? websiteUrl;
   final String? location;
   final String bio;
@@ -21,6 +22,7 @@ class ContactInfo {
     this.linkedinUrl,
     this.githubUrl,
     this.mediumUrl,
+    this.resumeUrl,
     this.websiteUrl,
     this.location,
     required this.bio,
@@ -37,6 +39,8 @@ class ContactInfo {
     linkedinUrl: 'https://id.linkedin.com/in/jesselyn-hartandi',
     githubUrl: 'https://github.com/javelinee',
     mediumUrl: 'https://medium.com/@yourdailyreads',
+    // Set this to your actual resume URL (e.g. Google Drive / Notion / PDF link).
+    resumeUrl: '',
     location: 'Jakarta, Indonesia',
     shortBio:
         'Software Engineer specializing in building scalable applications and solving complex technical challenges. Passionate about clean code, user experience, and innovative solutions.',
@@ -53,6 +57,7 @@ class ContactInfo {
     String? linkedinUrl,
     String? githubUrl,
     String? mediumUrl,
+    String? resumeUrl,
     String? websiteUrl,
     String? location,
     String? bio,
@@ -67,6 +72,7 @@ class ContactInfo {
       linkedinUrl: linkedinUrl ?? this.linkedinUrl,
       githubUrl: githubUrl ?? this.githubUrl,
       mediumUrl: mediumUrl ?? this.mediumUrl,
+      resumeUrl: resumeUrl ?? this.resumeUrl,
       websiteUrl: websiteUrl ?? this.websiteUrl,
       location: location ?? this.location,
       bio: bio ?? this.bio,

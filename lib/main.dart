@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
 import 'widgets/modern_navigation.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Future.wait([
+    GoogleFonts.pendingFonts([
+      GoogleFonts.inter(),
+      GoogleFonts.poppins(),
+    ]),
+  ]);
   runApp(const PortfolioApp());
 }
 

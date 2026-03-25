@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import '../models/project.dart';
 
 class DummyProjects {
@@ -13,6 +14,7 @@ class DummyProjects {
       driveUrl:
           'https://drive.google.com/file/d/17tjtSxIS4cYTudIm2Hq-fLv9FgjVBx2e/view?usp=drive_link',
       imageUrl: 'assets/uri_book.png',
+      backgroundColor: const Color(0xFFF97316),
     ),
     Project(
       id: '2',
@@ -24,6 +26,7 @@ class DummyProjects {
       completedDate: DateTime(2020, 6, 30),
       driveUrl: 'https://drive.google.com/file/d/1def456ghi789/view',
       imageUrl: 'assets/tournal.png',
+      backgroundColor: const Color(0xFF0EA5E9),
     ),
     Project(
       id: '3',
@@ -35,19 +38,20 @@ class DummyProjects {
       completedDate: DateTime(2022, 1, 30),
       githubUrl: 'https://github.com/jesselynhartandi/password-manager',
       imageUrl: 'assets/password_manager.png',
+      backgroundColor: const Color(0xFF6366F1),
     ),
     Project(
       id: '4',
       title: 'Luma Blocks',
       description:
-          'a simple Tetris-inspired block game with four buttons that gives a little "mini console" feeling.',
-      technologies: ['Flutter'],
+          'A Tetris-inspired block game with four buttons that delivers a satisfying mini-console feeling.',
+      technologies: ['Flutter', 'Dart'],
       category: ProjectCategory.game,
       completedDate: DateTime(2025, 12, 10),
-      imageUrl: 'assets/luma_blocks.png',
-      testingGroupUrl: 'https://groups.google.com/g/luma-blocks-testers',
+      imageUrl: 'luma_new_app_logo.png',
       playStoreUrl:
           'https://play.google.com/store/apps/details?id=com.javes.block_app',
+      backgroundColor: const Color(0xFF1A1A2E),
     ),
   ];
 

@@ -3,6 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../pages/single_page_portfolio.dart';
 import '../providers/theme_provider.dart';
+import '../models/contact_info.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../utils/responsive_breakpoints.dart';
 
 class ModernNavigation extends StatefulWidget {
   const ModernNavigation({super.key});
@@ -14,6 +17,15 @@ class ModernNavigation extends StatefulWidget {
 class _ModernNavigationState extends State<ModernNavigation> {
   int _currentIndex = 0;
   final GlobalKey<SinglePagePortfolioState> _portfolioKey = GlobalKey();
+
+  Future<void> _launchUrl(String url) async {
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return;
+    final uri = Uri.parse(trimmed);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   void _navigateToSection(int index) {
     setState(() {
@@ -41,89 +53,85 @@ class _ModernNavigationState extends State<ModernNavigation> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-    final isWeb = MediaQuery.of(context).size.width > 768;
+    final isWeb = ResponsiveBreakpoints.isTabletUp(context);
+    final isDesktop = ResponsiveBreakpoints.isDesktopUp(context);
+    final maxWidth = ResponsiveBreakpoints.isWideUp(context) ? 1200.0 : 1100.0;
+    final hPad = isDesktop ? 56.0 : (isWeb ? 20.0 : 16.0);
 
     return Scaffold(
+      backgroundColor: isDark
+          ? const Color(0xFF0d1b2a)
+          : const Color(0xFFF6F8FC),
       body: Column(
         children: [
-          // Enhanced Modern Top Navigation Bar
-          Container(
-            height: 70,
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF0d1b2a) : const Color(0xFFFFFFFF),
-              border: Border(
-                bottom: BorderSide(
-                  color: isDark
-                      ? Colors.white.withOpacity(0.05)
-                      : const Color(0xFFe2e8f0),
-                  width: 1,
-                ),
-              ),
-              boxShadow: isDark
-                  ? null
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: isWeb ? 48 : 24),
-                child: Row(
-                  children: [
-                    // Logo on the left
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          'favicon.png',
-                          fit: BoxFit.contain,
-                          filterQuality: FilterQuality.high,
-                        ),
+          // Floating Navigation Bar
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: EdgeInsets.only(top: 12, left: hPad, right: hPad),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxWidth),
+                  child: Container(
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF131f30).withOpacity(0.95)
+                          : Colors.white.withOpacity(0.97),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withOpacity(0.07)
+                            : const Color(0xFFe2e8f0),
+                        width: 1,
                       ),
                     ),
-                    
-                    const Spacer(),
-                    
-                    // Navigation Items
-                    if (isWeb) ...[
-                      // Web Navigation
-                      Row(
-                        children: [
-                          _buildNavItem(context, 'Experience', 0),
-                          const SizedBox(width: 32),
-                          _buildNavItem(context, 'Projects', 1),
-                          const SizedBox(width: 32),
-                          _buildNavItem(context, 'Contact', 2),
-                        ],
-                      ),
-                      const Spacer(),
-                      _buildThemeToggle(context),
-                    ] else ...[
-                      // Mobile Navigation
-                      Row(
-                        children: [
-                          _buildThemeToggle(context),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            onPressed: () => _showMobileMenu(context),
-                            icon: Icon(
-                              Icons.menu,
-                              color: colorScheme.onSurface,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: isWeb
+                          ? Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Left: logo + brand name
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: _buildLogo(context),
+                                ),
+                                // Center: nav links
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _buildNavItem(context, 'Experience', 0),
+                                    const SizedBox(width: 4),
+                                    _buildNavItem(context, 'Projects', 1),
+                                    const SizedBox(width: 4),
+                                    _buildNavItem(context, 'Contact', 2),
+                                  ],
+                                ),
+                                // Right: theme toggle
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: _buildThemeToggle(context),
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                _buildLogo(context),
+                                const Spacer(),
+                                _buildThemeToggle(context),
+                                const SizedBox(width: 4),
+                                IconButton(
+                                  onPressed: () => _showMobileMenu(context),
+                                  icon: Icon(
+                                    Icons.menu,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -136,11 +144,46 @@ class _ModernNavigationState extends State<ModernNavigation> {
     );
   }
 
-  Widget _buildNavItem(
-    BuildContext context,
-    String label,
-    int index,
-  ) {
+  Widget _buildLogo(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(7)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(7),
+            child: Image.asset(
+              'assets/favicon.png',
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.high,
+              errorBuilder: (_, __, ___) => Icon(
+                Icons.code,
+                size: 20,
+                color: isDark ? Colors.white : const Color(0xFF1e293b),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          'JH.dev',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: isDark ? Colors.white : const Color(0xFF0f172a),
+            letterSpacing: -0.3,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNavItem(BuildContext context, String label, int index) {
     final isSelected = _currentIndex == index;
 
     return _EnhancedNavItem(
@@ -154,6 +197,8 @@ class _ModernNavigationState extends State<ModernNavigation> {
 
   void _showMobileMenu(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final resumeUrl = ContactInfo.personal.resumeUrl ?? '';
+    final hasResume = resumeUrl.trim().isNotEmpty;
 
     showModalBottomSheet(
       context: context,
@@ -181,6 +226,36 @@ class _ModernNavigationState extends State<ModernNavigation> {
             _buildMobileMenuItem(context, 'Experience', Icons.work, 0),
             _buildMobileMenuItem(context, 'Projects', Icons.folder, 1),
             _buildMobileMenuItem(context, 'Contact', Icons.contact_mail, 2),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: Icon(
+                Icons.picture_as_pdf_outlined,
+                color: hasResume
+                    ? colorScheme.primary
+                    : colorScheme.onSurface.withOpacity(0.5),
+              ),
+              title: Text(
+                'Resume',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  color: hasResume
+                      ? colorScheme.primary
+                      : colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
+              onTap: hasResume
+                  ? () async {
+                      Navigator.pop(context);
+                      await _launchUrl(resumeUrl);
+                    }
+                  : null,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              tileColor: hasResume
+                  ? colorScheme.primary.withOpacity(0.08)
+                  : null,
+            ),
 
             const SizedBox(height: 24),
           ],
@@ -342,4 +417,3 @@ class _EnhancedNavItemState extends State<_EnhancedNavItem>
     }
   }
 }
-
