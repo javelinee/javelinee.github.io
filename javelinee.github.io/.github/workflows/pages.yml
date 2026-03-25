@@ -27,7 +27,7 @@ jobs:
       - name: Upload artifact (plain static HTML — no Jekyll)
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: 'javelinee.github.io'
 
       - name: Deploy to GitHub Pages
         id: deployment
