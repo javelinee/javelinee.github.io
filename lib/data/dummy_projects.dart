@@ -48,7 +48,7 @@ class DummyProjects {
       technologies: ['Flutter', 'Dart'],
       category: ProjectCategory.game,
       completedDate: DateTime(2025, 12, 10),
-      imageUrl: 'luma_new_app_logo.png',
+      imageUrl: 'assets/luma_new_app_logo.png',
       playStoreUrl:
           'https://play.google.com/store/apps/details?id=com.javes.block_app',
       backgroundColor: const Color(0xFF1A1A2E),
